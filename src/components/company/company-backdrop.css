@@ -1,0 +1,88 @@
+.company-backdrop {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  pointer-events: none;
+  overflow: clip;
+}
+
+.company-column {
+  display: grid;
+  align-content: space-between;
+  padding-block: clamp(2rem, 6vh, 4.5rem);
+  min-width: 0;
+}
+
+.company-tile {
+  width: clamp(21rem, 29vw, 34.5rem);
+  min-height: 10rem;
+  padding: 1.0625rem;
+  border: 1px solid #17171a;
+  border-radius: 0.625rem;
+  background: #090909 url("/company-card-texture.webp") left top / 100% 100% no-repeat;
+  box-shadow: 0 3px 14px rgb(4 3 10 / 35%);
+  color: #53565c;
+}
+
+.company-tile-description {
+  width: min(100%, 22rem);
+  margin-top: 0.875rem;
+  color: #4c5054;
+}
+
+.company-tile-sectors {
+  margin-top: 0.75rem;
+  opacity: 0.3;
+}
+
+.company-column-start .company-tile {
+  justify-self: start;
+  margin-inline-start: -7.5rem;
+}
+
+.company-column-start .company-tile:nth-child(even) {
+  margin-inline-start: -13rem;
+}
+
+.company-column-end .company-tile {
+  justify-self: end;
+  margin-inline-end: -6.5rem;
+}
+
+.company-column-end .company-tile:nth-child(even) {
+  margin-inline-end: -14rem;
+}
+
+.company-tile-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.375rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #092940;
+  color: #526170;
+  font: italic 1.375rem Georgia, serif;
+}
+
+.company-tile-status {
+  margin-inline-start: auto;
+  align-self: flex-start;
+  border-radius: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  background: #130e10;
+  color: #733b42;
+  font-size: 0.75rem;
+}
+
+.company-tile-status-acquired {
+  background: #16130d;
+  color: #79613d;
+}
+
+@media (max-width: 70rem), (max-height: 43rem) {
+  .company-backdrop {
+    display: none;
+  }
+}
