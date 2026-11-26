@@ -1,10 +1,12 @@
 import { createOTP } from "@better-auth/utils/otp";
 import { symmetricDecrypt } from "better-auth/crypto";
-import { connection } from "next/server";
+import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { auth } from "@/lib/auth";
+import { canReadDemoCodes } from "@/lib/demo-code-access";
 import { prisma } from "@/lib/prisma";
-import { TEST_PASSWORD } from "@/lib/test-accounts";
+import { TEST_ACCOUNTS, TEST_PASSWORD } from "@/lib/test-accounts";
 
 // Development helper, provided with the exercise: it replaces the mailbox and the authenticator app.
 // Not part of the UI to build.
@@ -14,7 +16,13 @@ const lastMail = (to: string, kind: "MFA_CODE" | "PASSWORD_RESET") =>
 
 const loadAccounts = async () => {
   const { secretConfig } = await auth.$context;
-  const users = await prisma.user.findMany({ include: { twofactors: true }, orderBy: { createdAt: "asc" } });
+  const users = await prisma.user.findMany({
+    where: process.env.NODE_ENV === "production"
+      ? { email: { in: TEST_ACCOUNTS.map(({ email }) => email) } }
+      : undefined,
+    include: { twofactors: true },
+    orderBy: { createdAt: "asc" },
+  });
 
   return Promise.all(
     users.map(async (user) => {
@@ -52,7 +60,7 @@ const Code = ({ value, sentAt }: { value?: string | null; sentAt?: Date }) =>
 
 // Reads the database on every request, so it streams in behind the static page shell.
 const Accounts = async () => {
-  await connection();
+  if (!canReadDemoCodes((await headers()).get("authorization"))) notFound();
   const accounts = await loadAccounts();
 
   return (
