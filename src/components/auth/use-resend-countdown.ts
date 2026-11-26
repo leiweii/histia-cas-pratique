@@ -10,15 +10,22 @@ export function retryAfterSeconds(response: Response) {
 }
 
 export function useResendCountdown(resendAt: number) {
-  const [now, setNow] = useState(() => Date.now());
-  const remaining = Math.max(0, Math.ceil((resendAt - now) / 1000));
+  const [now, setNow] = useState<number | null>(null);
+  const remaining = now === null ? 0 : Math.max(0, Math.ceil((resendAt - now) / 1000));
   const coolingDown = remaining > 0;
 
   useEffect(() => {
-    if (!coolingDown) return;
-    const timer = window.setInterval(() => setNow(Date.now()), 250);
-    return () => window.clearInterval(timer);
-  }, [coolingDown]);
+    if (!resendAt) return;
+
+    function tick() {
+      const currentTime = Date.now();
+      setNow(currentTime);
+      if (currentTime < resendAt) timer = window.setTimeout(tick, 250);
+    }
+
+    let timer = window.setTimeout(tick, 0);
+    return () => window.clearTimeout(timer);
+  }, [resendAt]);
 
   function start(seconds = cooldownSeconds) {
     const startedAt = Date.now();
